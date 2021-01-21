@@ -89,28 +89,45 @@ class SaveInGalleryPlugin(
             return
         }
 
+        var picturesDirectory = getExternalStoragePublicDirectory(DIRECTORY_PICTURES)
+
+        if(!picturesDirectory.exists()){
+            picturesDirectory.mkdirs()
+        }
+
+
         val directory = if (directoryName == null || directoryName.isEmpty()) {
-            getExternalStoragePublicDirectory(DIRECTORY_PICTURES)
+            picturesDirectory
         } else {
-            File(getExternalStoragePublicDirectory(DIRECTORY_PICTURES), directoryName)
+            File(picturesDirectory, directoryName)
         }
 
         if (!directory.exists()) {
             directory.mkdirs()
         }
 
+
         val name =
                 imageName ?: TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()).toString()
         val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
         val formattedName = makeSureNameFormatIsCorrect(name)
-        val imageFile = File(directory, formattedName)
+        var imageFile = File(directory, formattedName)
 
-        if (imageFile.exists()) {
-            imageFile.delete()
+        try{
+            if (imageFile.exists()) {
+                imageFile.delete()
+            }
+
+            if(!imageFile.exists()){
+                imageFile = File(directory, formattedName)
+                imageFile.getParentFile().mkdirs();
+                imageFile.createNewFile()
+            };
+        }catch (e: IOException){
+            request.result.error("Error","while creating file ${imageFile.toString()} ${e.message}", null)
         }
 
-        if(!imageFile.exists()) imageFile.createNewFile();
 
         try {
             FileOutputStream(imageFile).use { out ->

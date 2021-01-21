@@ -110,8 +110,10 @@ class SaveInGalleryPlugin(
             imageFile.delete()
         }
 
+        if(!imageFile.exists()) imageFile.createNewFile();
+
         try {
-            FileOutputStream(File(directory, formattedName)).use { out ->
+            FileOutputStream(imageFile).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
             MediaScannerConnection.scanFile(context,
@@ -119,7 +121,7 @@ class SaveInGalleryPlugin(
 
             request.result.success(true)
         } catch (e: IOException) {
-            request.result.error("ERROR", "Error while saving image into file: ${e.message}", null)
+            request.result.error("ERROR onSaveImageCalled", "Error while saving image into file: ${e.message}", null)
         }
     }
 
@@ -165,7 +167,7 @@ class SaveInGalleryPlugin(
                         arrayOf(imageFile.toString()), null, null)
             } catch (e: IOException) {
                 request.result.error(
-                        "ERROR",
+                        "ERROR onSaveImagesCalled",
                         "Error while saving image into file: ${e.message}",
                         null
                 )
@@ -217,7 +219,7 @@ class SaveInGalleryPlugin(
                         arrayOf(imageFile.toString()), null, null)
             } catch (e: IOException) {
                 request.result.error(
-                        "ERROR",
+                        "ERROR onSaveNamedImagesCalled",
                         "Error while saving image into file: ${e.message}",
                         null
                 )

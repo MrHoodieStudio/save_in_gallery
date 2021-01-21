@@ -31,7 +31,8 @@ class ImageSaver {
         },
       );
       return result;
-    } on PlatformException {
+    } catch (e) {
+      print(e.toString());
       return false;
     }
   }
@@ -57,7 +58,8 @@ class ImageSaver {
         },
       );
       return result;
-    } on PlatformException {
+    } catch (e) {
+      print(e.toString());
       return false;
     }
   }
